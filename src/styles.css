@@ -1,0 +1,58 @@
+@import "@fontsource-variable/plus-jakarta-sans";
+@import "leaflet/dist/leaflet.css";
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #071727;
+  --color-navy-soft: #0b132b;
+  --color-navy-light: #0c2033;
+  --color-brand-red: #df1738;
+  --color-brand-red-hover: #c91432;
+  --color-ink: #2d3035;
+  --color-muted: #686d74;
+  --color-mist: #f7f8f9;
+  --color-line: #e8e8e8;
+  --font-sans: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", sans-serif;
+  --shadow-card: 0 15px 40px rgba(7, 23, 39, 0.08);
+}
+
+@layer base {
+  * { @apply border-line; }
+  html { scroll-behavior: smooth; }
+  body { @apply m-0 min-w-80 bg-white font-sans text-ink antialiased; }
+  button, a, input { @apply outline-none; }
+  :focus-visible { @apply ring-2 ring-brand-red ring-offset-2; }
+}
+
+@layer components {
+  .eyebrow { @apply text-[11px] font-extrabold tracking-[1.8px] text-brand-red uppercase; }
+  .section-title { @apply mt-4 text-[36px] leading-[1.15] font-bold tracking-[-1.2px] text-navy sm:text-[46px]; }
+  .button-primary { @apply inline-flex h-[54px] cursor-pointer items-center justify-center gap-3 rounded-[5px] bg-brand-red px-7 text-sm font-bold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-brand-red-hover; }
+.icon-disc { @apply flex size-11 items-center justify-center rounded-full bg-brand-red/8 text-brand-red; }
+}
+
+.taxilux-marker {
+  display: flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  color: #fff;
+  font-family: "Plus Jakarta Sans Variable", sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 5px 16px rgba(7, 23, 39, 0.25);
+}
+
+.taxilux-marker-pickup { background: #071727; }
+.taxilux-marker-destination { background: #df1738; }
+.taxilux-map { background: #f8f9fa; }
+.taxilux-map .leaflet-tile-pane { opacity: 0.9; filter: grayscale(0.72) saturate(0.45) contrast(0.84) brightness(1.14); }
+.taxilux-map .leaflet-overlay-pane { filter: drop-shadow(0 2px 3px rgba(223, 23, 56, 0.18)); }
+.taxilux-map .leaflet-control-zoom { overflow: hidden; border: 1px solid #e8e8e8; border-radius: 5px; box-shadow: 0 8px 25px rgba(7, 23, 39, 0.1); }
+.taxilux-map .leaflet-control-zoom a { border-color: #e8e8e8; background: #fff; color: #071727; font-family: "Plus Jakarta Sans Variable", sans-serif; }
+.taxilux-map .leaflet-control-zoom a:hover { background: #f7f8f9; color: #df1738; }
+.taxilux-map .leaflet-control-attribution { border-radius: 4px 0 0; background: rgba(255, 255, 255, 0.88); color: #686d74; font-family: "Plus Jakarta Sans Variable", sans-serif; font-size: 9px; }
+.taxilux-map .leaflet-control-attribution a { color: #071727; }
