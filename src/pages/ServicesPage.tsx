@@ -11,7 +11,7 @@ const clientServices = [
     items: ['Trajets dans la Région de Bruxelles-Capitale', 'Transferts vers et depuis Brussels Airport', 'Réservation à l’avance', 'Tarif connu avant la prise en charge', 'Service adapté aux passagers et aux bagages', 'Véhicules adaptés selon vos besoins'],
     cta: 'Réserver un trajet',
     href: '/reservation',
-    image: '/images/services/service-1.png',
+    image: '/images/services/service-privee.jpeg',
   },
   {
     icon: faBriefcase,
@@ -20,7 +20,7 @@ const clientServices = [
     items: ['Déplacements professionnels à Bruxelles', 'Transferts de collaborateurs et d’invités', 'Transferts vers et depuis Brussels Airport', 'Réservations planifiées à l’avance', 'Service discret et professionnel', 'Solutions adaptées aux besoins des entreprises'],
     cta: 'Télécharger l’application',
     href: '#application',
-    image: '/images/services/service-2.png',
+    image: '/images/services/service-airport.jpeg',
   },
 ]
 

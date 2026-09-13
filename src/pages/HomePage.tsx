@@ -31,8 +31,8 @@ const audiences = [
     text: 'TAXI-LUX accompagne les particuliers pour leurs déplacements dans la Région de Bruxelles-Capitale ainsi que pour leurs transferts vers et depuis Brussels Airport. Réservez votre trajet à l’avance pour organiser votre prise en charge et connaître votre tarif avant le départ.',
     items: ['Trajets dans la Région de Bruxelles-Capitale', 'Transferts vers et depuis Brussels Airport', 'Réservation à l’avance', 'Tarif connu avant la prise en charge', 'Service adapté aux passagers et aux bagages', 'Véhicules adaptés selon vos besoins'],
     cta: 'Réserver un trajet',
-    image: '/images/services/service-1.png',
-    imageAlt: 'Passagers privés près d’un véhicule premium',
+    image: '/images/services/service-privee.jpeg',
+    imageAlt: 'Véhicule TAXI-LUX pour les trajets privés à Bruxelles',
   },
   {
     icon: faBriefcase,
@@ -40,8 +40,8 @@ const audiences = [
     text: 'TAXI-LUX accompagne les entreprises dans l’organisation des déplacements de leurs collaborateurs, clients et invités dans la Région de Bruxelles-Capitale ainsi que pour leurs transferts vers et depuis Brussels Airport. Les trajets peuvent être planifiés à l’avance selon les besoins de l’entreprise.',
     items: ['Déplacements professionnels à Bruxelles', 'Transferts de collaborateurs et d’invités', 'Transferts vers et depuis Brussels Airport', 'Réservations planifiées à l’avance', 'Service discret et professionnel', 'Solutions adaptées aux besoins des entreprises'],
     cta: 'Télécharger l’application',
-    image: '/images/services/service-2.png',
-    imageAlt: 'Environnement professionnel à Bruxelles',
+    image: '/images/services/service-airport.jpeg',
+    imageAlt: 'Véhicule TAXI-LUX devant Brussels Airport',
   },
 ]
 
