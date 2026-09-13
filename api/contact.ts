@@ -35,22 +35,33 @@ export default {
     const subject = body.subject.trim()
     const message = body.message.trim()
 
-    await mailer.sendMail({
-      from: mailFrom,
-      to: contactEmail,
-      replyTo: email,
-      subject: `Contact TAXI-LUX · ${subject}`,
-      html: `<h1>Nouvelle demande TAXI-LUX</h1><p><strong>Nom :</strong> ${escapeHtml(name)}</p><p><strong>Téléphone :</strong> ${escapeHtml(phone)}</p><p><strong>E-mail :</strong> ${escapeHtml(email)}</p><p><strong>Objet :</strong> ${escapeHtml(subject)}</p><p><strong>Message :</strong></p><p>${escapeHtml(message).replaceAll('\n', '<br>')}</p>`,
-    })
-
-    if (sendCustomerMail) {
+    try {
       await mailer.sendMail({
         from: mailFrom,
-        to: email,
-        replyTo: contactEmail,
-        subject: 'Votre demande TAXI-LUX a bien été reçue',
-        html: `<h1>Merci ${escapeHtml(name)}</h1><p>Nous avons bien reçu votre demande concernant « ${escapeHtml(subject)} ».</p><p>Notre équipe vous répondra dans les meilleurs délais.</p><p>TAXI-LUX</p>`,
+        to: contactEmail,
+        replyTo: email,
+        subject: `Contact TAXI-LUX · ${subject}`,
+        html: `<h1>Nouvelle demande TAXI-LUX</h1><p><strong>Nom :</strong> ${escapeHtml(name)}</p><p><strong>Téléphone :</strong> ${escapeHtml(phone)}</p><p><strong>E-mail :</strong> ${escapeHtml(email)}</p><p><strong>Objet :</strong> ${escapeHtml(subject)}</p><p><strong>Message :</strong></p><p>${escapeHtml(message).replaceAll('\n', '<br>')}</p>`,
       })
+    } catch (error) {
+      const smtpError = error as { code?: string; command?: string }
+      console.error('CONTACT_SMTP_FAILED', { code: smtpError.code, command: smtpError.command })
+      return json({ error: smtpError.code === 'EAUTH' ? 'MAIL_AUTH_FAILED' : 'MAIL_SEND_FAILED' }, 502)
+    }
+
+    if (sendCustomerMail) {
+      try {
+        await mailer.sendMail({
+          from: mailFrom,
+          to: email,
+          replyTo: contactEmail,
+          subject: 'Votre demande TAXI-LUX a bien été reçue',
+          html: `<h1>Merci ${escapeHtml(name)}</h1><p>Nous avons bien reçu votre demande concernant « ${escapeHtml(subject)} ».</p><p>Notre équipe vous répondra dans les meilleurs délais.</p><p>TAXI-LUX</p>`,
+        })
+      } catch (error) {
+        const smtpError = error as { code?: string; command?: string }
+        console.error('CONTACT_ACKNOWLEDGEMENT_FAILED', { code: smtpError.code, command: smtpError.command })
+      }
     }
 
     return json({ ok: true })

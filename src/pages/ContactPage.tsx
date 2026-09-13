@@ -11,10 +11,12 @@ const contactDetails = [
 
 export function ContactPage() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
 
   async function submitContact(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setStatus('sending')
+    setErrorMessage('')
     const form = event.currentTarget
     const formData = new FormData(form)
 
@@ -25,10 +27,14 @@ export function ContactPage() {
         body: JSON.stringify(Object.fromEntries(formData)),
       })
 
-      if (!response.ok) throw new Error('CONTACT_FAILED')
+      if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('ROUTE_UNAVAILABLE')
+      const result = await response.json() as { ok?: boolean; error?: string }
+      if (!response.ok || result.ok !== true) throw new Error(result.error ?? 'CONTACT_FAILED')
       form.reset()
       setStatus('success')
-    } catch {
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : 'CONTACT_FAILED'
+      setErrorMessage(reason === 'MAIL_NOT_CONFIGURED' ? 'Le service e-mail n’est pas configuré. Contactez-nous directement à info@taxi-lux.be.' : reason === 'MAIL_AUTH_FAILED' ? 'Le service e-mail refuse la connexion. Contactez-nous directement à info@taxi-lux.be.' : reason === 'ROUTE_UNAVAILABLE' ? 'Le formulaire n’est pas connecté au service d’envoi. Contactez-nous directement à info@taxi-lux.be.' : 'Impossible d’envoyer votre message. Veuillez réessayer ou nous contacter directement.')
       setStatus('error')
     }
   }
@@ -69,7 +75,7 @@ export function ContactPage() {
               <label className="absolute -left-[9999px]" aria-hidden="true">Site web<input name="website" tabIndex={-1} autoComplete="off" /></label>
             </div>
             {status === 'success' && <p className="mt-6 rounded-[5px] bg-[#ecf8f1] p-4 text-xs font-bold text-[#146c43]"><FontAwesomeIcon icon={faCircleCheck} className="mr-2" />Votre message a bien été envoyé.</p>}
-            {status === 'error' && <p className="mt-6 rounded-[5px] bg-brand-red/8 p-4 text-xs font-bold text-brand-red">Impossible d’envoyer votre message. Veuillez réessayer ou nous contacter directement.</p>}
+            {status === 'error' && <p role="alert" className="mt-6 rounded-[5px] bg-brand-red/8 p-4 text-xs font-bold text-brand-red">{errorMessage}</p>}
             <button type="submit" disabled={status === 'sending'} className="button-primary mt-6 w-full disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">{status === 'sending' ? <><FontAwesomeIcon icon={faSpinner} spin />Envoi en cours…</> : <>Envoyer ma demande <FontAwesomeIcon icon={faArrowRight} /></>}</button>
             <p className="mt-4 text-[11px] leading-5 text-muted">En envoyant ce formulaire, vous acceptez que TAXI-LUX utilise vos informations pour répondre à votre demande.</p>
           </form>
