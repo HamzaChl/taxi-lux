@@ -15,7 +15,7 @@ type AddressAutocompleteProps = {
 export function AddressAutocomplete({ label, value, onChange, accent = false, error }: AddressAutocompleteProps) {
   const [query, setQuery] = useState(value?.displayName ?? '')
   const [isOpen, setIsOpen] = useState(false)
-  const { results, isSearching, clearResults } = useAddressSearch(query)
+  const { results, isSearching, clearResults } = useAddressSearch(query, isOpen && !value)
 
   function selectAddress(location: LocationValue) {
     onChange(location)

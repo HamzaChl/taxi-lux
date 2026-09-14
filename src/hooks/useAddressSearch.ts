@@ -1,31 +1,31 @@
 import { useEffect, useState } from 'react'
-import { searchNominatim } from '../services/nominatim'
+import { searchPhoton } from '../services/photon'
 import type { LocationValue } from '../types/booking'
 
-export function useAddressSearch(query: string) {
+export function useAddressSearch(query: string, enabled = true) {
   const [results, setResults] = useState<LocationValue[]>([])
   const [isSearching, setIsSearching] = useState(false)
 
   useEffect(() => {
-    if (query.trim().length < 3) {
+    if (!enabled || query.trim().length < 3) {
       return
     }
     const controller = new AbortController()
     const timer = window.setTimeout(async () => {
       setIsSearching(true)
       try {
-        setResults(await searchNominatim(query, controller.signal))
+        setResults(await searchPhoton(query, controller.signal))
       } catch (error) {
         if (!(error instanceof DOMException && error.name === 'AbortError')) setResults([])
       } finally {
         if (!controller.signal.aborted) setIsSearching(false)
       }
-    }, 400)
+    }, 600)
     return () => {
       window.clearTimeout(timer)
       controller.abort()
     }
-  }, [query])
+  }, [query, enabled])
 
-  return { results: query.trim().length < 3 ? [] : results, isSearching: query.trim().length >= 3 && isSearching, clearResults: () => setResults([]) }
+  return { results: enabled && query.trim().length >= 3 ? results : [], isSearching: enabled && query.trim().length >= 3 && isSearching, clearResults: () => setResults([]) }
 }
