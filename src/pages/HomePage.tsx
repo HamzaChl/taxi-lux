@@ -56,8 +56,8 @@ export function HomePage() {
   return (
     <>
       <section className="relative overflow-hidden bg-navy text-white">
-        <div className="absolute inset-0 bg-[url('/images/header/pexels-claudia-schmalz-3928374-6076230.jpg')] bg-cover bg-center" />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,23,39,.98)_0%,rgba(7,23,39,.91)_38%,rgba(7,23,39,.42)_70%,rgba(7,23,39,.18)_100%)]" />
+        <div className="absolute inset-0 bg-[url('/images/header/header.jpeg')] bg-cover bg-center" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,23,39,.98)_0%,rgba(7,23,39,.91)_50%,rgba(7,23,39,.72)_82%,rgba(7,23,39,.42)_92%,rgba(7,23,39,.12)_100%)]" />
         <div className="relative mx-auto flex min-h-[650px] max-w-7xl items-center px-5 py-24 sm:px-8 lg:min-h-[700px]">
           <div className="max-w-2xl">
             <p className="eyebrow">Taxi-Lux · Depuis 1996</p>

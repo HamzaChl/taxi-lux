@@ -29,8 +29,8 @@ export function AppDownloadSection() {
             </a>
           </div>
         </div>
-        <div className="relative mt-10 h-[470px] lg:mt-0 lg:h-[520px]">
-          <img src="/images/general/mcu01-scaled.png" alt="Application mobile TAXI-LUX" className="absolute top-1/2 right-[-45px] h-[min(520px,125vw)] w-auto max-w-none -translate-y-1/2 object-contain drop-shadow-[0_30px_45px_rgba(0,0,0,0.3)] sm:right-[-20px] lg:right-[-70px] lg:h-[520px]" />
+        <div className="relative mt-10 h-[400px] sm:h-[470px] lg:mt-0 lg:h-[520px]">
+          <img src="/images/general/mcu01-scaled.png" alt="Application mobile TAXI-LUX" className="absolute top-1/2 left-1/2 h-[min(440px,110vw)] w-auto max-w-none -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_30px_45px_rgba(0,0,0,0.3)] sm:h-[520px] lg:right-[-70px] lg:left-auto lg:h-[520px] lg:translate-x-0" />
         </div>
       </div>
     </section>

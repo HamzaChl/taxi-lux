@@ -27,10 +27,8 @@ const clientServices = [
 export function ServicesPage() {
   return (
     <>
-      <section className="relative overflow-hidden bg-navy px-5 py-24 text-center text-white sm:px-8 lg:py-30">
-        <div className="absolute inset-0 bg-[url('/images/header/file_000000006db0821087314619dbd0642c.png')] bg-cover bg-center opacity-25" />
-        <div className="absolute inset-0 bg-navy/75" />
-        <div className="relative mx-auto max-w-3xl"><p className="eyebrow">TAXI-LUX</p><h1 className="mt-5 text-[44px] leading-[1.15] font-bold tracking-[-1.5px] sm:text-[52px]">Services</h1><p className="mt-6 text-[15px] leading-[1.8] text-white/70">Particulier ou professionnel, TAXI-LUX organise vos déplacements dans la Région de Bruxelles-Capitale ainsi que vos transferts vers et depuis Brussels Airport, avec un service ponctuel, confortable et adapté à vos besoins.</p></div>
+      <section className="bg-navy px-5 py-24 text-white sm:px-8">
+        <div className="mx-auto max-w-7xl"><p className="eyebrow">TAXI-LUX</p><h1 className="mt-5 max-w-3xl text-[42px] leading-[1.15] font-bold tracking-[-1.5px] sm:text-[52px]">Services</h1><p className="mt-7 max-w-2xl text-[15px] leading-[1.8] text-white/70">Particulier ou professionnel, TAXI-LUX organise vos déplacements dans la Région de Bruxelles-Capitale ainsi que vos transferts vers et depuis Brussels Airport, avec un service ponctuel, confortable et adapté à vos besoins.</p></div>
       </section>
 
       <section className="px-5 py-24 sm:px-8 lg:py-30">
