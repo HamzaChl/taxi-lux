@@ -40,7 +40,7 @@ const audiences = [
     text: 'TAXI-LUX accompagne les entreprises dans l’organisation des déplacements de leurs collaborateurs, clients et invités dans la Région de Bruxelles-Capitale ainsi que pour leurs transferts vers et depuis Brussels Airport. Les trajets peuvent être planifiés à l’avance selon les besoins de l’entreprise.',
     items: ['Déplacements professionnels à Bruxelles', 'Transferts de collaborateurs et d’invités', 'Transferts vers et depuis Brussels Airport', 'Réservations planifiées à l’avance', 'Service discret et professionnel', 'Solutions adaptées aux besoins des entreprises'],
     cta: 'Télécharger l’application',
-    image: '/images/services/service-airport.jpeg',
+    image: '/images/services/proff.jpeg',
     imageAlt: 'Véhicule TAXI-LUX devant Brussels Airport',
   },
 ]
@@ -60,7 +60,7 @@ export function HomePage() {
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,23,39,.98)_0%,rgba(7,23,39,.91)_50%,rgba(7,23,39,.72)_82%,rgba(7,23,39,.42)_92%,rgba(7,23,39,.12)_100%)]" />
         <div className="relative mx-auto flex min-h-[650px] max-w-7xl items-center px-5 py-24 sm:px-8 lg:min-h-[700px]">
           <div className="max-w-2xl">
-            <p className="eyebrow">Taxi-Lux · Depuis 1996</p>
+            <p className="text-[14px] font-extrabold tracking-[1.8px] text-brand-red uppercase sm:text-[16px]">Taxi officiel Brussels Airport</p>
             <h1 className="mt-6 text-[40px] leading-[1.12] font-bold tracking-[-1.8px] sm:text-[52px]">À Bruxelles.<br />Vers et depuis Brussels Airport.</h1>
             <p className="mt-7 max-w-[670px] text-[14px] leading-[1.8] text-white/75 sm:text-[15px]">TAXI-LUX organise vos déplacements privés et professionnels dans la Région de Bruxelles-Capitale, ainsi que vos transferts vers et depuis Brussels Airport. Réservez votre trajet à l’avance sur notre site ou via l’application et connaissez votre tarif avant votre prise en charge.</p>
             <div className="mt-6 flex items-center gap-3 text-sm font-bold text-white"><span className="h-0.5 w-8 bg-brand-red" />Des tarifs avantageux, connus à l’avance.</div>
