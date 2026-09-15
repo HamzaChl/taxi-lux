@@ -6,8 +6,12 @@ Les réécritures existantes et les autres fonctions API sont conservées.
 
 Modifier les tarifs mobiles dans **`config/mobile-pricing.ts`**, y compris
 `updatedAt` lors d'un changement. Conserver les nombres sans guillemets et
-le champ obligatoire `hourlyRate`. Les tarifs du calculateur web dans
-`src/constants/pricing.ts` sont distincts.
+le champ obligatoire `hourlyRate`. La prise en charge (2,60 € jour / 4,60 € nuit)
+et le tarif kilométrique (2,30 €/km, aucun kilomètre inclus) reprennent ceux du
+calculateur web dans `src/constants/pricing.ts`. L'endpoint mobile ne facture
+pas d'attente (`hourlyRate: 0`) et ne définit aucun minimum de course.
+Les deux tranches ont le même tarif ; le seuil de 35 km reste présent pour
+conserver le format attendu par l'application.
 
 Chaque modification nécessite un **redéploiement du site Vercel**, mais aucune
 nouvelle publication de l'application mobile. Aucun compte, secret ni base de
@@ -28,7 +32,7 @@ node scripts/check-pricing.mjs
 
 Utiliser `vercel dev` pour tester la fonction et la réécriture : `npm run dev`
 seul sert le frontend Vite.
-Le script vérifie les valeurs initiales exactes demandées ; adapter ces valeurs
+Le script vérifie les valeurs exactes configurées ; adapter ces valeurs
 de référence lors d'une future modification des tarifs.
 
 ## Déploiement (à effectuer manuellement)
