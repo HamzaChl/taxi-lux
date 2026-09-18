@@ -14,9 +14,13 @@ import { StripePayment } from './StripePayment'
 import { createPaymentIntent } from '../../services/payments'
 
 const bookingSchema = z.object({
+  tripType: z.enum(['one-way', 'round-trip']),
   pickupDate: z.string().min(1, 'Sélectionnez une date'),
   pickupTime: z.string().min(1, 'Sélectionnez une heure'),
   waitingMinutes: z.number().min(0),
+  returnDate: z.string().optional(),
+  returnTime: z.string().optional(),
+  returnWaitingMinutes: z.number().min(0).optional(),
   firstName: z.string().trim().min(2, 'Minimum 2 caractères'),
   lastName: z.string().trim().min(2, 'Minimum 2 caractères'),
   phone: z.string().trim().min(6, 'Téléphone requis'),
@@ -24,6 +28,11 @@ const bookingSchema = z.object({
   passengers: z.number().min(1).max(8).optional(),
   luggage: z.number().min(0).max(12).optional(),
   notes: z.string().optional(),
+}).superRefine((values, context) => {
+  if (values.tripType !== 'round-trip') return
+  if (!values.returnDate) context.addIssue({ code: 'custom', path: ['returnDate'], message: 'Sélectionnez une date de retour' })
+  if (!values.returnTime) context.addIssue({ code: 'custom', path: ['returnTime'], message: 'Sélectionnez une heure de retour' })
+  if (values.returnDate && values.returnTime && `${values.returnDate}T${values.returnTime}` <= `${values.pickupDate}T${values.pickupTime}`) context.addIssue({ code: 'custom', path: ['returnTime'], message: 'Le retour doit avoir lieu après l’aller' })
 })
 
 const inputClass = 'mt-2 h-[52px] w-full rounded-[5px] border border-white/15 bg-white/8 px-4 text-sm font-medium text-white placeholder:text-white/35 focus:border-brand-red'
@@ -35,15 +44,23 @@ export function TaxiLuxBooking() {
   const [addressErrors, setAddressErrors] = useState({ pickup: '', destination: '' })
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [payment, setPayment] = useState<{ clientSecret: string; bookingId: string; price: number } | null>(null)
-  const { route, status } = useRoute(pickup, destination)
   const { register, handleSubmit, control, formState: { errors, isValid } } = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
     mode: 'onChange',
-    defaultValues: { waitingMinutes: 0, passengers: 1, luggage: 1, pickupDate: '', pickupTime: '', firstName: '', lastName: '', phone: '', email: '', notes: '' },
+    defaultValues: { tripType: 'one-way', waitingMinutes: 0, returnWaitingMinutes: 0, passengers: 1, luggage: 1, pickupDate: '', pickupTime: '', returnDate: '', returnTime: '', firstName: '', lastName: '', phone: '', email: '', notes: '' },
   })
   const values = useWatch({ control }) as BookingFormValues
-  const price = useMemo(() => route && values.pickupTime ? calculateFare(route.distanceKm, values.pickupTime, Number(values.waitingMinutes) || 0) : null, [route, values.pickupTime, values.waitingMinutes])
-  const canSubmit = Boolean(pickup && destination && route && status === 'route-ready' && isValid)
+  const roundTrip = values.tripType === 'round-trip'
+  const { route, status } = useRoute(pickup, destination)
+  const { route: returnRoute, status: returnStatus } = useRoute(roundTrip ? destination : null, roundTrip ? pickup : null)
+  const price = useMemo(() => {
+    if (!route || !values.pickupTime) return null
+    const outboundFare = calculateFare(route.distanceKm, values.pickupTime, Number(values.waitingMinutes) || 0)
+    if (!roundTrip) return outboundFare
+    if (!returnRoute || !values.returnTime) return null
+    return Math.round((outboundFare + calculateFare(returnRoute.distanceKm, values.returnTime, Number(values.returnWaitingMinutes) || 0)) * 100) / 100
+  }, [route, returnRoute, roundTrip, values.pickupTime, values.returnTime, values.waitingMinutes, values.returnWaitingMinutes])
+  const canSubmit = Boolean(pickup && destination && route && status === 'route-ready' && (!roundTrip || (returnRoute && returnStatus === 'route-ready')) && isValid)
 
   function updatePickup(value: LocationValue | null) {
     setPickup(value)
@@ -63,11 +80,15 @@ export function TaxiLuxBooking() {
     setSubmitStatus('submitting')
     try {
       const result = await createPaymentIntent({
+        tripType: formValues.tripType,
         pickup,
         destination,
         pickupDate: formValues.pickupDate,
         pickupTime: formValues.pickupTime,
         waitingMinutes: formValues.waitingMinutes,
+        returnDate: roundTrip ? formValues.returnDate : undefined,
+        returnTime: roundTrip ? formValues.returnTime : undefined,
+        returnWaitingMinutes: roundTrip ? formValues.returnWaitingMinutes : undefined,
         customer: {
           firstName: formValues.firstName,
           lastName: formValues.lastName,
@@ -78,6 +99,7 @@ export function TaxiLuxBooking() {
           notes: formValues.notes,
         },
         route,
+        returnRoute: roundTrip ? returnRoute ?? undefined : undefined,
         estimatedPrice: price,
       })
       setPayment(result)
@@ -99,6 +121,10 @@ export function TaxiLuxBooking() {
         <div className="mt-9 border-t border-white/10 pt-7">
           <h2 className="text-sm font-bold">Votre trajet</h2>
           <div className="mt-5 space-y-5">
+            <div className="grid grid-cols-2 rounded-[6px] border border-white/15 bg-white/5 p-1">
+              <label className={`cursor-pointer rounded-[4px] px-4 py-3 text-center text-xs font-bold transition ${!roundTrip ? 'bg-white text-navy' : 'text-white/65 hover:text-white'}`}><input type="radio" value="one-way" {...register('tripType')} className="sr-only" />Aller simple</label>
+              <label className={`cursor-pointer rounded-[4px] px-4 py-3 text-center text-xs font-bold transition ${roundTrip ? 'bg-white text-navy' : 'text-white/65 hover:text-white'}`}><input type="radio" value="round-trip" {...register('tripType')} className="sr-only" />Aller-retour</label>
+            </div>
             <AddressAutocomplete label="Adresse de départ" value={pickup} onChange={updatePickup} error={addressErrors.pickup} />
             <AddressAutocomplete label="Adresse de destination" value={destination} onChange={updateDestination} accent error={addressErrors.destination} />
             <div className="grid gap-4 sm:grid-cols-2">
@@ -106,6 +132,7 @@ export function TaxiLuxBooking() {
               <label className={labelClass}>Heure de prise en charge<input type="time" {...register('pickupTime')} className={inputClass} />{errors.pickupTime && <span className="mt-2 block text-[11px] normal-case text-[#ff6680]">{errors.pickupTime.message}</span>}</label>
             </div>
             <label className={labelClass}>Temps d’attente<select {...register('waitingMinutes', { valueAsNumber: true })} className={inputClass}>{[0, 5, 10, 15, 20, 30, 45, 60].map(minutes => <option key={minutes} value={minutes} className="text-navy">{minutes === 0 ? 'Sans attente' : `${minutes} min`}</option>)}</select></label>
+            {roundTrip && <div className="space-y-4 rounded-[6px] border border-white/15 bg-white/5 p-4"><p className="text-xs font-bold text-white">Trajet retour · destination vers départ</p><div className="grid gap-4 sm:grid-cols-2"><label className={labelClass}>Date du retour<input type="date" {...register('returnDate')} className={inputClass} />{errors.returnDate && <span className="mt-2 block text-[11px] normal-case text-[#ff6680]">{errors.returnDate.message}</span>}</label><label className={labelClass}>Heure du retour<input type="time" {...register('returnTime')} className={inputClass} />{errors.returnTime && <span className="mt-2 block text-[11px] normal-case text-[#ff6680]">{errors.returnTime.message}</span>}</label></div><label className={labelClass}>Attente au retour<select {...register('returnWaitingMinutes', { valueAsNumber: true })} className={inputClass}>{[0, 5, 10, 15, 20, 30, 45, 60].map(minutes => <option key={minutes} value={minutes} className="text-navy">{minutes === 0 ? 'Sans attente' : `${minutes} min`}</option>)}</select></label></div>}
           </div>
         </div>
 
@@ -122,8 +149,8 @@ export function TaxiLuxBooking() {
           </div>
         </div>
 
-        {status === 'calculating-route' && <p className="mt-5 text-xs font-semibold text-white/65"><FontAwesomeIcon icon={faSpinner} spin className="mr-2 text-brand-red" />Calcul de votre trajet…</p>}
-        {status === 'route-error' && <p className="mt-5 text-xs font-semibold leading-5 text-[#ff6680]">Impossible de calculer cet itinéraire. Veuillez vérifier les adresses sélectionnées.</p>}
+        {(status === 'calculating-route' || (roundTrip && returnStatus === 'calculating-route')) && <p className="mt-5 text-xs font-semibold text-white/65"><FontAwesomeIcon icon={faSpinner} spin className="mr-2 text-brand-red" />Calcul de votre trajet…</p>}
+        {(status === 'route-error' || (roundTrip && returnStatus === 'route-error')) && <p className="mt-5 text-xs font-semibold leading-5 text-[#ff6680]">Impossible de calculer cet itinéraire. Veuillez vérifier les adresses sélectionnées.</p>}
         {submitStatus === 'success' && <p className="mt-5 rounded-[5px] bg-white/10 p-4 text-xs font-semibold text-white"><FontAwesomeIcon icon={faCircleCheck} className="mr-2 text-brand-red" />Votre trajet est prêt pour la prochaine étape de paiement.</p>}
         {submitStatus === 'error' && <p className="mt-5 rounded-[5px] bg-white/10 p-4 text-xs font-semibold leading-5 text-[#ff6680]">Le paiement en ligne n’est pas encore disponible. L’API TAXI-LUX doit fournir le service sécurisé de création du paiement.</p>}
         <button type="submit" disabled={!canSubmit || submitStatus === 'submitting'} className="button-primary mt-7 w-full disabled:cursor-not-allowed disabled:bg-white/15 disabled:text-white/40 disabled:hover:translate-y-0">{submitStatus === 'submitting' ? <><FontAwesomeIcon icon={faSpinner} spin />Préparation…</> : <>Réserver ce trajet <FontAwesomeIcon icon={faArrowRight} /></>}</button>
@@ -131,7 +158,7 @@ export function TaxiLuxBooking() {
       </form>
 
       <BookingMap pickup={pickup} destination={destination} route={route}>
-        <BookingSummary pickup={pickup} destination={destination} route={route} values={values} price={price} />
+        <BookingSummary pickup={pickup} destination={destination} route={route} returnRoute={returnRoute} values={values} price={price} />
       </BookingMap>
     </div>
   )

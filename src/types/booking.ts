@@ -13,9 +13,13 @@ export type RouteData = {
 export type BookingStatus = 'idle' | 'searching-address' | 'calculating-route' | 'route-ready' | 'route-error' | 'submitting' | 'success' | 'error'
 
 export type BookingFormValues = {
+  tripType: 'one-way' | 'round-trip'
   pickupDate: string
   pickupTime: string
   waitingMinutes: number
+  returnDate?: string
+  returnTime?: string
+  returnWaitingMinutes?: number
   firstName: string
   lastName: string
   phone: string
@@ -26,11 +30,15 @@ export type BookingFormValues = {
 }
 
 export type BookingData = {
+  tripType: 'one-way' | 'round-trip'
   pickup: LocationValue
   destination: LocationValue
   pickupDate: string
   pickupTime: string
   waitingMinutes: number
+  returnDate?: string
+  returnTime?: string
+  returnWaitingMinutes?: number
   customer: {
     firstName: string
     lastName: string
@@ -41,5 +49,6 @@ export type BookingData = {
     notes?: string
   }
   route: RouteData
+  returnRoute?: RouteData
   estimatedPrice: number
 }

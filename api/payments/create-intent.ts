@@ -1,13 +1,17 @@
 import Stripe from 'stripe'
-import { contactEmail, escapeHtml, getMailer, isEmail, isText, json, mailFrom } from '../_shared.js'
+import { isEmail, isText, json } from '../_shared.js'
 
 type LocationInput = { displayName?: unknown; lat?: unknown; lon?: unknown }
 type BookingInput = {
+  tripType?: unknown
   pickup?: LocationInput
   destination?: LocationInput
   pickupDate?: unknown
   pickupTime?: unknown
   waitingMinutes?: unknown
+  returnDate?: unknown
+  returnTime?: unknown
+  returnWaitingMinutes?: unknown
   customer?: {
     firstName?: unknown
     lastName?: unknown
@@ -55,16 +59,23 @@ export default {
 
     const customer = booking.customer
     const waitingMinutes = Number(booking.waitingMinutes)
+    const tripType = booking.tripType === 'round-trip' ? 'round-trip' : 'one-way'
+    const returnWaitingMinutes = Number(booking.returnWaitingMinutes ?? 0)
     const passengers = Number(customer?.passengers ?? 1)
     const luggage = Number(customer?.luggage ?? 0)
 
-    if (!validLocation(booking.pickup) || !validLocation(booking.destination) || !isText(booking.pickupDate, 10, 10) || !/^\d{2}:\d{2}$/.test(String(booking.pickupTime)) || !Number.isFinite(waitingMinutes) || waitingMinutes < 0 || waitingMinutes > 180 || !customer || !isText(customer.firstName, 2, 100) || !isText(customer.lastName, 2, 100) || !isText(customer.phone, 6, 30) || !isEmail(customer.email) || !Number.isFinite(passengers) || passengers < 1 || passengers > 8 || !Number.isFinite(luggage) || luggage < 0 || luggage > 12 || (customer.notes !== undefined && !isText(customer.notes, 0, 1000))) {
+    const invalidReturn = tripType === 'round-trip' && (!isText(booking.returnDate, 10, 10) || !/^\d{2}:\d{2}$/.test(String(booking.returnTime)) || `${booking.returnDate}T${booking.returnTime}` <= `${booking.pickupDate}T${booking.pickupTime}` || !Number.isFinite(returnWaitingMinutes) || returnWaitingMinutes < 0 || returnWaitingMinutes > 180)
+
+    if (!validLocation(booking.pickup) || !validLocation(booking.destination) || !isText(booking.pickupDate, 10, 10) || !/^\d{2}:\d{2}$/.test(String(booking.pickupTime)) || !Number.isFinite(waitingMinutes) || waitingMinutes < 0 || waitingMinutes > 180 || invalidReturn || !customer || !isText(customer.firstName, 2, 100) || !isText(customer.lastName, 2, 100) || !isText(customer.phone, 6, 30) || !isEmail(customer.email) || !Number.isFinite(passengers) || passengers < 1 || passengers > 8 || !Number.isFinite(luggage) || luggage < 0 || luggage > 12 || (customer.notes !== undefined && !isText(customer.notes, 0, 1000))) {
       return json({ error: 'INVALID_BOOKING_DATA' }, 400)
     }
 
     try {
       const distanceKm = await routeDistance(booking.pickup as LocationInput, booking.destination as LocationInput)
-      const price = calculateFare(distanceKm, String(booking.pickupTime), waitingMinutes)
+      const returnDistanceKm = tripType === 'round-trip' ? await routeDistance(booking.destination as LocationInput, booking.pickup as LocationInput) : 0
+      const outboundPrice = calculateFare(distanceKm, String(booking.pickupTime), waitingMinutes)
+      const returnPrice = tripType === 'round-trip' ? calculateFare(returnDistanceKm, String(booking.returnTime), returnWaitingMinutes) : 0
+      const price = Math.round((outboundPrice + returnPrice) * 100) / 100
       const bookingId = crypto.randomUUID()
       const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
       const intent = await stripe.paymentIntents.create({
@@ -74,24 +85,25 @@ export default {
         receipt_email: customer.email,
         metadata: {
           bookingId,
+          tripType,
+          firstName: String(customer.firstName).slice(0, 500),
+          lastName: String(customer.lastName).slice(0, 500),
+          phone: String(customer.phone).slice(0, 500),
+          pickup: String(booking.pickup?.displayName).slice(0, 500),
+          destination: String(booking.destination?.displayName).slice(0, 500),
+          passengers: String(passengers),
+          luggage: String(luggage),
+          notes: String(customer.notes ?? '').slice(0, 500),
           pickupDate: String(booking.pickupDate),
           pickupTime: String(booking.pickupTime),
           distanceKm: distanceKm.toFixed(2),
+          returnDate: tripType === 'round-trip' ? String(booking.returnDate) : '',
+          returnTime: tripType === 'round-trip' ? String(booking.returnTime) : '',
+          returnDistanceKm: tripType === 'round-trip' ? returnDistanceKm.toFixed(2) : '',
         },
       }, { idempotencyKey: bookingId })
 
       if (!intent.client_secret) return json({ error: 'PAYMENT_INTENT_FAILED' }, 502)
-
-      const mailer = getMailer()
-      if (mailer) {
-        await mailer.sendMail({
-          from: mailFrom,
-          to: contactEmail,
-          replyTo: customer.email,
-          subject: `Nouvelle réservation en attente · ${bookingId}`,
-          html: `<h1>Nouvelle réservation TAXI-LUX</h1><p><strong>Référence :</strong> ${bookingId}</p><p><strong>Client :</strong> ${escapeHtml(customer.firstName)} ${escapeHtml(customer.lastName)}</p><p><strong>Téléphone :</strong> ${escapeHtml(customer.phone)}</p><p><strong>E-mail :</strong> ${escapeHtml(customer.email)}</p><p><strong>Départ :</strong> ${escapeHtml(booking.pickup?.displayName)}</p><p><strong>Destination :</strong> ${escapeHtml(booking.destination?.displayName)}</p><p><strong>Date :</strong> ${escapeHtml(booking.pickupDate)} à ${escapeHtml(booking.pickupTime)}</p><p><strong>Passagers :</strong> ${passengers}</p><p><strong>Bagages :</strong> ${luggage}</p><p><strong>Distance :</strong> ${distanceKm.toFixed(2)} km</p><p><strong>Tarif :</strong> ${price.toFixed(2)} €</p><p><strong>Statut :</strong> paiement en attente</p><p><strong>Instructions :</strong> ${escapeHtml(customer.notes)}</p>`,
-        })
-      }
 
       return json({ clientSecret: intent.client_secret, bookingId, price })
     } catch {

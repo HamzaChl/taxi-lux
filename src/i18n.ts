@@ -2,6 +2,8 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
 const en: Record<string, string> = {
+  'Trajet retour · destination vers départ': 'Return journey · destination to pickup',
+  'Aller simple': 'One way', 'Aller-retour': 'Round trip', 'Date du retour': 'Return date', 'Heure du retour': 'Return time', 'Attente au retour': 'Return waiting time', 'Sélectionnez une date de retour': 'Select a return date', 'Sélectionnez une heure de retour': 'Select a return time', 'Le retour doit avoir lieu après l’aller': 'The return must take place after the outbound journey', 'Distance totale': 'Total distance', 'Durée totale': 'Total duration', 'Retour :': 'Return:',
   'Accueil': 'Home', 'Services': 'Services', 'Entreprises': 'Business', 'À propos': 'About', 'Contact': 'Contact', 'Réserver': 'Book', 'Réserver un trajet': 'Book a ride', 'Estimer un trajet': 'Estimate a ride',
   'Service de taxi premium à Bruxelles & Brussels Airport · Disponible 24h/24, 7j/7': 'Premium taxi service in Brussels & Brussels Airport · Available 24/7',
   'Votre partenaire de confiance pour tous vos déplacements à Bruxelles et au-delà.': 'Your trusted partner for every journey in Brussels and beyond.',
@@ -25,6 +27,8 @@ const en: Record<string, string> = {
 }
 
 const nl: Record<string, string> = {
+  'Trajet retour · destination vers départ': 'Terugrit · bestemming naar vertrekpunt',
+  'Aller simple': 'Enkele rit', 'Aller-retour': 'Heen en terug', 'Date du retour': 'Retourdatum', 'Heure du retour': 'Retourtijd', 'Attente au retour': 'Wachttijd bij terugkeer', 'Sélectionnez une date de retour': 'Selecteer een retourdatum', 'Sélectionnez une heure de retour': 'Selecteer een retourtijd', 'Le retour doit avoir lieu après l’aller': 'De terugrit moet na de heenrit plaatsvinden', 'Distance totale': 'Totale afstand', 'Durée totale': 'Totale duur', 'Retour :': 'Terugrit:',
   'Accueil': 'Home', 'Services': 'Diensten', 'Entreprises': 'Bedrijven', 'À propos': 'Over ons', 'Contact': 'Contact', 'Réserver': 'Boeken', 'Réserver un trajet': 'Een rit boeken', 'Estimer un trajet': 'Een rit schatten',
   'Service de taxi premium à Bruxelles & Brussels Airport · Disponible 24h/24, 7j/7': 'Premium taxiservice in Brussel & Brussels Airport · 24/7 beschikbaar',
   'Votre partenaire de confiance pour tous vos déplacements à Bruxelles et au-delà.': 'Uw betrouwbare partner voor al uw verplaatsingen in Brussel en daarbuiten.', 'Navigation': 'Navigatie', 'Tous droits réservés.': 'Alle rechten voorbehouden.', 'Mentions légales': 'Wettelijke vermeldingen', 'Politique de confidentialité': 'Privacybeleid', 'Conditions générales d’utilisation': 'Gebruiksvoorwaarden',
