@@ -130,7 +130,7 @@ export function AppLayout() {
         <div className="px-5 sm:px-8">
           <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-5 border-t py-7 text-[11px] text-muted sm:flex-row">
             <p>© {new Date().getFullYear()} TAXI-LUX. Tous droits réservés.</p>
-            <nav className="flex flex-wrap justify-center gap-x-6 gap-y-3"><Link to="/mentions-legales" className="transition hover:text-brand-red">Mentions légales</Link><Link to="/politique-de-confidentialite" className="transition hover:text-brand-red">Politique de confidentialité</Link><Link to="/conditions-generales-utilisation" className="transition hover:text-brand-red">Conditions générales d’utilisation</Link></nav>
+            <nav className="flex flex-wrap justify-center gap-x-6 gap-y-3"><Link to="/mentions-legales" className="transition hover:text-brand-red">Mentions légales</Link><Link to="/politique-de-confidentialite" className="transition hover:text-brand-red">Politique de confidentialité</Link><Link to="/conditions-generales-dutilisation/" className="transition hover:text-brand-red">Conditions générales d’utilisation</Link></nav>
           </div>
         </div>
       </footer>

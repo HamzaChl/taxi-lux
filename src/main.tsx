@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import { AppLayout } from './components/AppLayout'
 import { AboutPage } from './pages/AboutPage'
 import { ContactPage } from './pages/ContactPage'
@@ -27,7 +27,8 @@ const router = createBrowserRouter([
       { path: '/reservation', element: <ReservationPage /> },
       { path: '/mentions-legales', element: <LegalNoticePage /> },
       { path: '/politique-de-confidentialite', element: <PrivacyPolicyPage /> },
-      { path: '/conditions-generales-utilisation', element: <TermsPage /> },
+      { path: '/conditions-generales-dutilisation/', element: <TermsPage /> },
+      { path: '/conditions-generales-utilisation', element: <Navigate to="/conditions-generales-dutilisation/" replace /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

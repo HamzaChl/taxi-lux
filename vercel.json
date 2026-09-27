@@ -1,5 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    { "source": "/conditions-generales-utilisation", "destination": "/conditions-generales-dutilisation/", "permanent": true },
+    { "source": "/conditions-generales-utilisation/", "destination": "/conditions-generales-dutilisation/", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/wp-json/taxilux/v1/pricing", "destination": "/api/pricing" },
     { "source": "/services", "destination": "/index.html" },
@@ -8,6 +12,7 @@
     { "source": "/reservation", "destination": "/index.html" },
     { "source": "/mentions-legales", "destination": "/index.html" },
     { "source": "/politique-de-confidentialite", "destination": "/index.html" },
-    { "source": "/conditions-generales-utilisation", "destination": "/index.html" }
+    { "source": "/conditions-generales-dutilisation", "destination": "/index.html" },
+    { "source": "/conditions-generales-dutilisation/", "destination": "/index.html" }
   ]
 }
